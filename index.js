@@ -40,50 +40,60 @@ var boardIsFull = function () {
   return true;
 };
 
+var turn = 0;
+
 var markSpace = function (x, y, player) {
   var marking = (player === player1 ? 'X' : 'O');
-  try {
-    rows[y][x] = marking;
-    if (rows[y].join('') === (marking + marking + marking)) {
+  
+  if (rows[y][x] !== ' ') {
+    turn--;
+    return 'That is an invalid space! Please try again!\n';
+    
+  }
+
+  rows[y][x] = marking;
+
+
+
+  if (rows[y][0] + rows[y][1] + rows[y][2] === marking + marking + marking) {
+    printBoard();
+    return player + ' wins!';
+    rl.close();
+  } else if (rows[0][x] + rows[1][x] + rows[2][x] === marking + marking + marking) {
+    printBoard();
+    return player + ' wins!';
+    rl.close();
+  } else if (y === x && (x === 0) || (x === 1) || (x === 2)) {
+    if (rows[0][0] + rows[1][1] + rows[2][2] === marking + marking + marking) {
       printBoard();
-      console.log(player + ' wins!');
-      rl.close();
-    } else if (rows[y][0] + rows[y][1] + rows[y][2] === marking + marking + marking) {
-      printBoard();
-      console.log(player + ' wins!');
-      rl.close();
-    } else if (y === x && (x === 0) || (x === 1) || (x === 2)) {
-      if (rows[0][0] + rows[1][1] + rows[2][2] === marking + marking + marking) {
-        printBoard();
-        console.log(player + ' wins!');
-        rl.close();
-      }
-    } else if (x + y === 2 && ((x === 0) || (x === 1) || (x === 2))) {
-      if (rows[0][2] + rows[1][1] + rows[2][0] === marking + marking + marking) {
-        printBoard();
-        console.log(player + ' wins!');
-        rl.close();
-      }
-    } else if (boardIsFull()) {
-      printBoard();
-      console.log('DRAW!');
+      return player + ' wins!';
       rl.close();
     }
-  } catch (e) {
-    console.log('That is an invalid spot!');
+  } else if (x + y === 2 && ((x === 0) || (x === 1) || (x === 2))) {
+    if (rows[0][2] + rows[1][1] + rows[2][0] === marking + marking + marking) {
+      printBoard();
+      return player + ' wins!';
+      rl.close();
+    }
+  } else if (boardIsFull()) {
+    printBoard();
+    return 'DRAW!';
+    rl.close();
+  } else {
   }
 };
 
-var turn = 0;
-
-var startGame = function () {
+var startGame = function (message) {
   printBoard();
   var currentPlayer = (turn % 2 ? player2 : player1);
-  rl.question(currentPlayer + ' where do you want to go?', function (response) {
+  if (!message) {
+    message = currentPlayer + ' where do you want to go?\n';
+  }
+  rl.question(message, function (response) {
     turn++;
     var coordinates = response.split(',');
-    markSpace(coordinates[0], coordinates[1], currentPlayer);
-    startGame();
+    message = markSpace(coordinates[0], coordinates[1], currentPlayer);
+    startGame(message);
   });
   
 };
