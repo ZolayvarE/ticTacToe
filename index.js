@@ -21,14 +21,14 @@ var printBoard = function () {
 
   console.log('Tic-Tac-Toe:\n');
   var counter = 0;
-  rows.forEach(function (row) {
-    console.log(row.join(' | '));
+  rows.forEach(function (row, index) {
+    console.log(2 - index + ' ' + row.join(' | '));
     counter++;
     if (counter <= 2) {
-      console.log('--+---+--')
+      console.log('  --+---+--');
     }
   });
-  console.log('');
+  console.log('  0   1   2\n');
 };
 
 var boardIsFull = function () {
@@ -53,8 +53,6 @@ var markSpace = function (x, y, player) {
 
   rows[y][x] = marking;
 
-
-
   if (rows[y][0] + rows[y][1] + rows[y][2] === marking + marking + marking) {
     printBoard();
     return player + ' wins!';
@@ -63,14 +61,14 @@ var markSpace = function (x, y, player) {
     printBoard();
     return player + ' wins!';
     rl.close();
-  } else if (y === x && (x === 0) || (x === 1) || (x === 2)) {
-    if (rows[0][0] + rows[1][1] + rows[2][2] === marking + marking + marking) {
+  } else if (y === x && ((x === 0) || (x === 1) || (x === 2))) {
+    if (rows[0][2] + rows[1][1] + rows[2][0] === marking + marking + marking) {
       printBoard();
       return player + ' wins!';
       rl.close();
     }
   } else if (x + y === 2 && ((x === 0) || (x === 1) || (x === 2))) {
-    if (rows[0][2] + rows[1][1] + rows[2][0] === marking + marking + marking) {
+    if (rows[0][0] + rows[1][1] + rows[2][2] === marking + marking + marking) {
       printBoard();
       return player + ' wins!';
       rl.close();
@@ -79,7 +77,6 @@ var markSpace = function (x, y, player) {
     printBoard();
     return 'DRAW!';
     rl.close();
-  } else {
   }
 };
 
@@ -91,9 +88,22 @@ var startGame = function (message) {
   }
   rl.question(message, function (response) {
     turn++;
-    var coordinates = response.split(',');
-    message = markSpace(coordinates[0], coordinates[1], currentPlayer);
-    startGame(message);
+    var coordinates = [];
+    for (var i = 0; i < response.length; i++) {
+      if ('' + Number(response[i]) !== 'NaN') {
+        coordinates.push(Number(response[i]));
+      }
+    }
+
+    if (coordinates.length >= 2) {
+      message = markSpace(coordinates[0], 2 - coordinates[1], currentPlayer);
+      startGame(message);
+    } else if (message && (message.includes('win') || message.includes('DRAW'))) {
+      rl.close();
+    } else {
+      turn--;
+      startGame('That is an invalid input!\n\nPlease try again, ' + currentPlayer + '!\n');
+    }
   });
   
 };
